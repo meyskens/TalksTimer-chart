@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "talkstimer.fullname" . }}
+  labels:
+    app: {{ template "talkstimer.name" . }}
+    chart: {{ template "talkstimer.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "talkstimer.name" . }}
+    release: {{ .Release.Name }}
+
+{{- $root := . }}
+{{- range $i, $e := until (.Values.replicaCount|int) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "talkstimer.fullname"  $root }}-{{ $i }}
+  labels:
+    app: {{ template "talkstimer.name"  $root }}
+    chart: {{ template "talkstimer.chart"  $root }}
+    release: {{ $root.Release.Name }}
+    heritage: {{ $root.Release.Service }}
+    instance: {{ $i }}
+spec:
+  type: {{ $root.Values.service.type }}
+  ports:
+    - port: {{ $root.Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "talkstimer.name"  $root }}
+    release: {{ $root.Release.Name }}
+    instance: {{ $i }}
+{{- end }}

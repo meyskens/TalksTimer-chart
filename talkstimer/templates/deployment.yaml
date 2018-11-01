@@ -1,0 +1,63 @@
+{{- $root := . }}
+{{- range $i, $e := until ($root.Values.replicaCount|int)}}
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "talkstimer.fullname" $root }}-{{ $i }}
+  labels:
+    app: {{ template "talkstimer.name" $root }}
+    chart: {{ template "talkstimer.chart" $root }}
+    release: {{ $root.Release.Name }}
+    heritage: {{ $root.Release.Service }}
+    instance: {{ $i }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "talkstimer.name" $root }}
+      release: {{ $root.Release.Name }}
+      instance: {{ $i }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "talkstimer.name" $root }}
+        release: {{ $root.Release.Name }}
+        instance: {{ $i }}
+    spec:
+      containers:
+        - name: {{ $root.Chart.Name }}
+          image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: TALKSTIMER_PORT
+              value: 80
+            - name: TALKSTIMER_INSTANCE
+              value: {{ $i }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml $root.Values.resources | indent 12 }}
+    {{- with $root.Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $root.Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $root.Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}
