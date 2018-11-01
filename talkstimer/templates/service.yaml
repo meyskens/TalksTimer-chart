@@ -30,7 +30,7 @@ metadata:
     chart: {{ template "talkstimer.chart"  $root }}
     release: {{ $root.Release.Name }}
     heritage: {{ $root.Release.Service }}
-    instance: {{ $i }}
+    instance: "{{ $i }}"
 spec:
   type: {{ $root.Values.service.type }}
   ports:
@@ -41,5 +41,5 @@ spec:
   selector:
     app: {{ template "talkstimer.name"  $root }}
     release: {{ $root.Release.Name }}
-    instance: {{ $i }}
+    instance: "{{ $i }}"
 {{- end }}

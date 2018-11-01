@@ -8,9 +8,7 @@ spec:
     storage: 1Gi 
   accessModes:
     - ReadWriteMany
-  mountOptions:
-    - hardkp
-    - nfsvers=4.1
+  mountOptions: []
   nfs:
       path: /mnt/nfs/talkstimer-mongodb
       server: 10.244.0.1
@@ -30,10 +28,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-mongodb
+  name: {{ template "talkstimer.fullname" . }}-mongodb
 spec:
   selector:
-    app: mongodb
+    app: {{ template "talkstimer.fullname" . }}-mongodb
     chart: {{ template "talkstimer.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -45,13 +43,13 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "talkstimer.fullname" . }}-
+  name: {{ template "talkstimer.fullname" . }}-mongodb
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: mongodb
+        app: {{ template "talkstimer.fullname" . }}-mongodb
         chart: {{ template "talkstimer.chart" . }}
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}

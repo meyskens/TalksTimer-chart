@@ -10,20 +10,20 @@ metadata:
     chart: {{ template "talkstimer.chart" $root }}
     release: {{ $root.Release.Name }}
     heritage: {{ $root.Release.Service }}
-    instance: {{ $i }}
+    instance: "{{ $i }}"
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: {{ template "talkstimer.name" $root }}
       release: {{ $root.Release.Name }}
-      instance: {{ $i }}
+      instance: "{{ $i }}"
   template:
     metadata:
       labels:
         app: {{ template "talkstimer.name" $root }}
         release: {{ $root.Release.Name }}
-        instance: {{ $i }}
+        instance: "{{ $i }}"
     spec:
       containers:
         - name: {{ $root.Chart.Name }}
@@ -34,10 +34,14 @@ spec:
               containerPort: 80
               protocol: TCP
           env:
+            - name: TALKSTIMER_DB
+              value: talkstimer
+            - name: TALKSTIMER_DBCONNECTION
+              value: "mongodb://{{ $root.Values.mongodb.username }}:{{ $root.Values.mongodb.password }}@{{ template "talkstimer.fullname" $root }}-mongodb"
             - name: TALKSTIMER_PORT
-              value: 80
+              value: "80"
             - name: TALKSTIMER_INSTANCE
-              value: {{ $i }}
+              value: "{{ $i }}"
           livenessProbe:
             httpGet:
               path: /
