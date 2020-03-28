@@ -1,7 +1,7 @@
 {{- $root := . }}
 {{- range $i, $e := until ($root.Values.replicaCount|int)}}
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "talkstimer.fullname" $root }}-{{ $i }}
@@ -37,7 +37,10 @@ spec:
             - name: TALKSTIMER_DB
               value: talkstimer
             - name: TALKSTIMER_DBCONNECTION
-              value: "mongodb://{{ $root.Values.mongodb.username }}:{{ $root.Values.mongodb.password }}@{{ template "talkstimer.fullname" $root }}-mongodb"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $root.Values.mongodb.secretName }}
+                  key: {{ $root.Values.mongodb.secretKey }}
             - name: TALKSTIMER_PORT
               value: "80"
             - name: TALKSTIMER_INSTANCE

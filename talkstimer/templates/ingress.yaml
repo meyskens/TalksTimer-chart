@@ -10,11 +10,14 @@ metadata:
     chart: {{ template "talkstimer.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
+{{- with $root.Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
+  {{- if $root.Values.ingress.tls }}
+  tls: {{- toYaml $root.Values.ingress.tls | nindent 4 }}
+  {{- end }}
   rules:
     - host: talkstimer.com
       http:
@@ -33,11 +36,14 @@ metadata:
     chart: {{ template "talkstimer.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
+{{- with $root.Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
+  {{- if $root.Values.ingress.tls }}
+  tls: {{- toYaml $root.Values.ingress.tls | nindent 4 }}
+  {{- end }}
   rules:
     - host: www.talkstimer.com
       http:
@@ -62,6 +68,9 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
+  {{- if $root.Values.ingress.tls }}
+  tls: {{- toYaml $root.Values.ingress.tls | nindent 4 }}
+  {{- end }}
   rules:
     - host: {{ $i }}.talkstimer.com
       http:

@@ -6,7 +6,7 @@ replicaCount: 5
 
 image:
   repository: maartje/talkstimer
-  tag: arm64-v0.1.3
+  tag: amd64-eb4e2ebd1a10a50fe692af0312f935eeb543e89a
   pullPolicy: IfNotPresent
 
 service:
@@ -14,17 +14,18 @@ service:
   port: 80
 
 ingress:
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "le-cf-issuer"
+  tls: 
+   - secretName: talkstimer-tls
+     hosts:
+       - talkstimer.com
+       - '*.talkstimer.com'
 
-mongodb: {}
-  # username:
-  # password:
+mongodb:
+  secretKey: TALKSTIMER_DBCONNECTION
+  secretName: talkstimer-mongodb
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
